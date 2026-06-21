@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monsoon Rice Economic Analysis Tool</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #27ae60;
+            padding-bottom: 10px;
+        }
+        .section-title {
+            font-size: 1.2rem;
+            color: #27ae60;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        .grid-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            margin-bottom: 5px;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        input {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+        input:focus {
+            border-color: #27ae60;
+            outline: none;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin-top: 25px;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background-color: #219653;
+        }
+        .results-box {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #eef9f1;
+            border-left: 5px solid #27ae60;
+            border-radius: 6px;
+            display: none; /* အဖြေတွက်မှ ပေါ်လာမည် */
+        }
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #ddd;
+            font-size: 1.05rem;
+        }
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        .highlight {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .badge {
+            padding: 3px 8px;
+            border-radius: 4px;
+            color: white;
+            font-weight: bold;
+        }
+        .bg-success { background-color: #27ae60; }
+        .bg-danger { background-color: #e74c3c; }
+        .bg-warning { background-color: #f39c12; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>မုတ်သုံစပါး စီးပွားရေးတွက်ချက်မှုစနစ် (Monsoon Rice Economic Analysis) By Agri-biz pioneer team</h2>
+    
+    <div class="section-title">၁။ အထွက်နှုန်းနှင့် စျေးနှုန်း (Production & Price)</div>
+    <div class="grid-inputs">
+        <div class="form-group">
+            <label for="yield">အထွက်နှုန်း - TP (တင်း/ဧက):</label>
+            <input type="number" id="yield" value="0" min="0">
+        </div>
+        <div class="form-group">
+            <label for="price">စပါးစျေးနှုန်း - PY (ကျပ်/တင်း):</label>
+            <input type="number" id="price" value="0" min="0">
+        </div>
+    </div>
+
+    <div class="section-title">၂။ သွင်းအားစုကုန်ကျစရိတ်များ - TVC (Variable Costs - ကျပ်/ဧက)</div>
+    <div class="grid-inputs">
+        <div class="form-group">
+            <label for="seeds">မျိုးစေ့ဖိုး (Seeds):</label>
+            <input type="number" id="seeds" value="0" min="0">
+        </div>
+        <div class="form-group">
+            <label for="fertilizers">မြေသြဇာဖိုး (Fertilizers):</label>
+            <input type="number" id="fertilizers" value="0" min="0">
+        </div>
+        <div class="form-group">
+            <label for="pesticides">ပိုးသတ်ဆေး/ပေါင်းသတ်ဆေး (Pesticides):</label>
+            <input type="number" id="pesticides" value="0" min="0">
+        </div>
+        <div class="form-group">
+            <label for="labor">လုပ်အားခ (Hired Labor):</label>
+            <input type="number" id="labor" value="0" min="0">
+        </div>
+        <div class="form-group">
+            <label for="fuel">ရေတင်ဆီဖိုး (Pumping Fuel):</label>
+            <input type="number" id="fuel" value="0" min="0">
+        </div>
+        <div class="form-group">
+            <label for="machinery">စက်ကိရိယာငှားရမ်းခ (Machine Rental):</label>
+            <input type="number" id="machinery" value="0" min="0">
+        </div>
+    </div>
+
+    <button type="button" onclick="calculateAnalysis()">တွက်ချက်မည် (Calculate)</button>
+
+    <div class="results-box" id="resultsBox">
+        <div class="section-title" style="margin-top: 0;">တွက်ချက်ရရှိသော ရလဒ်များ (Analysis Results)</div>
+        
+        <div class="result-item">
+            <span>စုစုပေါင်း ဝင်ငွေ (Total Return - TR):</span>
+            <div><span class="highlight" id="resTR">0</span> ကျပ်/ဧက</div>
+        </div>
+        <div class="result-item">
+            <span>စုစုပေါင်း သွင်းအားစုစရိတ် (Total Variable Cost - TVC):</span>
+            <div><span class="highlight" id="resTVC">0</span> ကျပ်/ဧက</div>
+        </div>
+        <div class="result-item">
+            <span>အသားတင်အကျိုးအမြတ် (Gross Margin - GM):</span>
+            <div><span class="highlight" id="resGM">0</span> ကျပ်/ဧက</div>
+        </div>
+        <div class="result-item">
+            <span>အကျိုးအမြတ် ကုန်ကျစရိတ် အချိုး (Benefit Cost Ratio - BCR):</span>
+            <div>
+                <span class="highlight" id="resBCR">0</span> 
+                <span id="bcrBadge" class="badge"></span>
+            </div>
+        </div>
+        <div class="result-item">
+            <span>အရှုံးအမြတ်ကျေမည့် အထွက်နှုန်း (Break-even Yield):</span>
+            <div><span class="highlight" id="resBE_Yield">0</span> တင်း/ဧက</div>
+        </div>
+        <div class="result-item">
+            <span>အရှုံးအမြတ်ကျေမည့် စျေးနှုန်း (Break-even Price):</span>
+            <div><span class="highlight" id="resBE_Price">0</span> ကျပ်/တင်း</div>
+        </div>
+    </div>
+</div>
+
+<script>
+function calculateAnalysis() {
+    try {
+        // Input တန်ဖိုးများကို သေချာစွာ Float နံပါတ်ပြောင်းလဲခြင်း (လွတ်နေလျှင် 0 ဟု ယူမည်)
+        const yieldTP = parseFloat(document.getElementById('yield').value) || 0;
+        const pricePY = parseFloat(document.getElementById('price').value) || 0;
+        
+        const seeds = parseFloat(document.getElementById('seeds').value) || 0;
+        const fertilizers = parseFloat(document.getElementById('fertilizers').value) || 0;
+        const pesticides = parseFloat(document.getElementById('pesticides').value) || 0;
+        const labor = parseFloat(document.getElementById('labor').value) || 0;
+        const fuel = parseFloat(document.getElementById('fuel').value) || 0;
+        const machinery = parseFloat(document.getElementById('machinery').value) || 0;
+
+        // ၁။ Total Return (TR) = TP x PY
+        const TR = yieldTP * pricePY;
+
+        // ၂။ Total Variable Cost (TVC)
+        const TVC = seeds + fertilizers + pesticides + labor + fuel + machinery;
+
+        // ၃။ Gross Margin (GM) = TR - TVC
+        const GM = TR - TVC;
+
+        // ၄။ Benefit Cost Ratio (BCR) = TR / TVC
+        const BCR = TVC > 0 ? (TR / TVC) : 0;
+
+        // ၅။ Break-even Yield = TVC / Average market price per basket
+        const breakEvenYield = pricePY > 0 ? (TVC / pricePY) : 0;
+
+        // ၆။ Break-even Price = TVC / Average yield per acre
+        const breakEvenPrice = yieldTP > 0 ? (TVC / yieldTP) : 0;
+
+        // ရလဒ်များကို မျက်နှာပြင်ပေါ်တွင် ထည့်သွင်းခြင်း
+        document.getElementById('resTR').innerText = TR.toLocaleString();
+        document.getElementById('resTVC').innerText = TVC.toLocaleString();
+        document.getElementById('resGM').innerText = GM.toLocaleString();
+        document.getElementById('resBCR').innerText = BCR.toFixed(2);
+        document.getElementById('resBE_Yield').innerText = breakEvenYield.toFixed(2);
+        document.getElementById('resBE_Price').innerText = Math.round(breakEvenPrice).toLocaleString();
+
+        // BCR အလိုက် စာတန်းနှင့် အရောင်ပြောင်းလဲခြင်း
+        const badge = document.getElementById('bcrBadge');
+        if (BCR > 1) {
+            badge.innerText = "အကျိုးအမြတ်ရှိ (Profitable)";
+            badge.className = "badge bg-success";
+        } else if (BCR < 1 && BCR > 0) {
+            badge.innerText = "အရှုံးပေါ်နေ (Loss)";
+            badge.className = "badge bg-danger";
+        } else if (BCR === 1 && TVC > 0) {
+            badge.innerText = "အရှုံးအမြတ်ကျေ (Break-even)";
+            badge.className = "badge bg-warning";
+        } else {
+            badge.innerText = "-";
+            badge.className = "badge";
+        }
+
+        // အဖြေပြသမည့် Box ကို ဖွင့်ပေးခြင်း
+        document.getElementById('resultsBox').style.display = 'block';
+
+    } catch (error) {
+        alert("တွက်ချက်မှုတွင် အမှားအယွင်းရှိနေပါသည်။ ဂဏန်းများကို သေချာစွာ ပြန်စစ်ပေးပါ။");
+        console.error(error);
+    }
+}
+</script>
+
+</body>
+</html>
